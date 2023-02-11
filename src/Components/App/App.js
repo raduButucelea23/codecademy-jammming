@@ -33,7 +33,6 @@ export class App extends React.Component {
   removeTrack(track) {
     if (this.state.playlistTracks.some(savedTrack => savedTrack.id === track.id)) {
       this.setState({
-        //fill in the code here
         playlistTracks: [...this.state.playlistTracks.filter(savedTrack => savedTrack.id !== track.id)]
       });
     }
@@ -55,7 +54,6 @@ export class App extends React.Component {
 
   search(searchTerm) {
     Spotify.search(searchTerm).then(searchResults => {
-      //this might be wrong since searchResults is an array of objects
       this.setState({searchResults: searchResults});
     });
   }

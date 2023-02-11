@@ -2,8 +2,6 @@ import React from 'react';
 import './SearchBar.css';
 
 
-
-
 export class SearchBar extends React.Component {
   constructor(props) {
     super(props);
@@ -12,8 +10,8 @@ export class SearchBar extends React.Component {
     this.state = { term: '' };
   }
   
-  search(term) {
-    this.props.onSearch(term);
+  search() {
+    this.props.onSearch(this.state.term);
   }
 
   handleTermChange(event) {
@@ -28,7 +26,7 @@ export class SearchBar extends React.Component {
           onChange={this.handleTermChange} 
         />
         <button className="SearchButton"
-          onClick={this.search(this.state.term)}
+          onClick={this.search}
         >SEARCH</button>
       </div>
     );
