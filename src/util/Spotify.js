@@ -1,8 +1,9 @@
 import { SearchBar } from "../Components/SearchBar/SearchBar";
+import {clientId as id} from "./config"
 
-const userAccessToken = '';
-const clientId = 'user_id';
-const redirectUri = 'http://localhost:3000/';
+let userAccessToken = '';
+const clientId = id;
+const redirectUri = 'http://jammmingwithradu.surge.sh';
 
 const Spotify = {
     getAccessToken() { 
@@ -23,11 +24,12 @@ const Spotify = {
         }},
     async search(term) {
         const accessToken = Spotify.getAccessToken();
-        const endpoint = 'https://api.spotify.com/v1/search?type=track&q=${term}';
-
+        const endpoint = `https://api.spotify.com/v1/search?type=track&q=${term}`;
         try {
             const response = await fetch(endpoint, {
-                headers: { Authorization: `Bearer ${accessToken}` }
+                headers: { Authorization: `Bearer ${accessToken}`
+
+            }
         });
         if (response.ok) {
             const responseJson = await response.json();
@@ -69,17 +71,18 @@ const Spotify = {
 
     async createPlaylist(name) {
         const accessToken = Spotify.getAccessToken();
-        const headers = { Authorization: `Bearer ${accessToken}`};
+        const headers = { Authorization: 
+                `Bearer ${accessToken}`,
+                'Content-Type': 'application/json'
+            };
         const userID = await Spotify.getUserID();
-        const playlistEndpoint = `https://api.spotify.com/v1/users/${userID}/playlists`;
+        const createPlayURL = `https://api.spotify.com/v1/users/${userID}/playlists`;
         const playlistID = '';
 
         try {
-            const response = await fetch(playlistEndpoint, {
+            const response = await fetch(createPlayURL, {
                 method: 'POST',
-                headers: {headers,
-                    'Content-Type': 'application/json'
-                },
+                headers: headers,
                 body: JSON.stringify({
                     name: name
                     })
@@ -98,7 +101,38 @@ const Spotify = {
         }
     },
 
-    async savePlaylist(trackUris) {
+    async savePlaylist(name, trackURIs) {
+        const accessToken = Spotify.getAccessToken();
+        const headers = { Authorization: 
+            `Bearer ${accessToken}`,
+            'Content-Type': 'application/json'
+        };
+        const playlistID = await Spotify.createPlaylist(name);
+        const addTracksURL = `/v1/playlists/${playlistID}/tracks`;
+
+        try {
+            const response = await fetch(addTracksURL, {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify({
+                    uris: trackURIs
+                })
+            })
+             
+            if (response.ok) {
+                const responseJson = await response.json();
+                
+                if (responseJson['snapshot_id']) {
+                    const snapshot_id = responseJson['snapshot_id'];
+                    console.log(`Great, the songs have been added. Snapshot: ${snapshot_id}`);
+                } else {
+                    throw new Error('The track has not been added to the playlist!')
+                }
+            }
+        } catch (error) {
+            console.log(error)
+        }
+
 
     }
 
@@ -109,5 +143,6 @@ const Spotify = {
 // 2. create a new playlist and return playlist ID: createPlaylist(name)
 // 3. savePlaylist(trackURIs)
 
+console.log(`This is the app's access token: ${Spotify.getAccessToken()}`)
 
 export default Spotify
